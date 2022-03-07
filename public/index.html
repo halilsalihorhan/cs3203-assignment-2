@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Assignment 1</title>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
+      integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      pre {
+        display: block;
+        padding: 9.5px;
+        margin: 0 0 10px;
+        font-size: 13px;
+        line-height: 1.42857143;
+        word-break: break-all;
+        word-wrap: break-word;
+      }
+      body,
+      div,
+      h1 {
+        padding: 0;
+        margin: 0;
+      }
+      .screen {
+        width: 100vw;
+        height: 100vh;
+        background-color: #27ae60;
+        display: flex;
+      }
+      .leftScreen {
+        max-width: 600px;
+        height: calc(100vh - 70px);
+        background-color: #ffffff;
+        padding: 35px;
+        display: flex;
+        align-items: center;
+      }
+      .rightScreen {
+        width: 100%;
+        height: calc(100vh - 70px);
+
+        padding: 35px;
+        display: flex;
+        align-items: center;
+      }
+      .title {
+        border-left: 5px solid #27ae60;
+        padding: 10px 0 10px 50px;
+        margin: 0 0 35px 0;
+        color: #27ae60;
+        font-size: 32px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      .inner {
+        width: 80%;
+        padding: 15px;
+        height: 600px;
+        background-color: #ffffff;
+        margin: auto;
+        -webkit-box-shadow: 13px 13px 10px 15px #ffffff;
+        box-shadow: 10px 10px 10px 15px #ffffff;
+        overflow-y: scroll;
+        scrollbar-color: #27ae60;
+      }
+
+      .container {
+        width: 100%;
+        min-height: 100px;
+      }
+      .button {
+        min-width: 100px;
+        background: #27ae60;
+        font-weight: bold;
+        color: white;
+        border: 0 none;
+        border-radius: 1px;
+        cursor: pointer;
+        padding: 10px 5px;
+        margin: 10px 5px;
+      }
+      .inputs {
+        width: 100%;
+      }
+      .input {
+        padding: 15px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        margin-bottom: 10px;
+        box-sizing: border-box;
+        font-family: montserrat;
+        color: #2c3e50;
+        font-size: 13px;
+      }
+    </style>
+    <script>
+      function httpGet(url) {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("GET", url, false);
+        xmlHttp.send(null);
+        return xmlHttp.responseText;
+      }
+      async function httpPost(url, data) {
+        var xhr = new XMLHttpRequest();
+        await xhr.open("POST", url, false);
+        await xhr.setRequestHeader("Content-Type", "application/json");
+        await xhr.send(JSON.stringify(data));
+        return await xhr.status;
+      }
+      async function get(path) {
+        $("#responseBody").text("");
+        const response = await httpGet(`http://localhost:3000/${path}`);
+        console.log(response);
+        $("#responseTitle").text(`get ${path}`);
+        $("#responseBody").text(
+          JSON.stringify(JSON.parse(`{"data": ${response} }`), undefined, 2)
+        );
+      }
+      async function getTweet() {
+        const id = $("#tweetById").val();
+        id && get(`tweets/${id}`);
+      }
+      async function postTweet() {
+        const id = $("#postId").val();
+        const tweet = $("#postText").val();
+        $("#responseBody").text("");
+        $("#responseTitle").text(`post Tweet /${id}`);
+        const status = await httpPost(`http://localhost:3000/post`, {
+          id: id,
+          text: tweet,
+        });
+        $("#responseBody").text(`status: ${status}`);
+      }
+      async function postName() {
+        const prev = $("#prevName").val();
+        const newt = $("#newName").val();
+        $("#responseBody").text("");
+        $("#responseTitle").text(`change name ${prev} -> ${newt}`);
+        const status = await httpPost(`http://localhost:3000/change`, {
+          screen_name: prev,
+          updated_screen_name: newt,
+        });
+        $("#responseBody").text(`status: ${status}`);
+      }
+      async function postDelete() {
+        const id = $("#deleteById").val();
+        $("#responseBody").text("");
+        $("#responseTitle").text(`delete post /${id}`);
+        const status = await httpPost(`http://localhost:3000/delete`, {
+          id: id,
+        });
+        $("#responseBody").text(`status: ${status}`);
+      }
+    </script>
+  </head>
+  <body>
+    <div class="screen">
+      <div class="leftScreen">
+        <div>
+          <h1 class="title">Assignment 1</h1>
+
+          <div class="container">
+            <input
+              onclick="get('tweets')"
+              class="button"
+              type="button"
+              value="Get Tweets"
+            />
+          </div>
+          <div class="container">
+            <input
+              onclick="get('users')"
+              class="button"
+              type="button"
+              value="Get Users"
+            />
+          </div>
+          <div class="container">
+            <input
+              onclick="getTweet()"
+              class="button"
+              type="button"
+              value="Get Tweet"
+            />
+            <div class="inputs">
+              <input
+                id="tweetById"
+                type="text"
+                placeholder="Tweet Id"
+                class="input"
+              />
+            </div>
+          </div>
+          <div class="container">
+            <input
+              onclick="postTweet()"
+              class="button"
+              type="button"
+              value="Post Tweet"
+            />
+            <div class="inputs">
+              <input
+                id="postId"
+                type="text"
+                placeholder="Tweet Id"
+                class="input"
+              />
+              <input
+                id="postText"
+                type="text"
+                placeholder="Tweet Text"
+                class="input"
+              />
+            </div>
+          </div>
+          <div class="container">
+            <input
+              onclick="postName()"
+              class="button"
+              type="button"
+              value="Change Name"
+            />
+            <div class="inputs">
+              <input
+                id="prevName"
+                type="text"
+                placeholder="Current Name"
+                class="input"
+              />
+              <input
+                id="newName"
+                type="text"
+                placeholder="New Name"
+                class="input"
+              />
+            </div>
+          </div>
+          <div class="container">
+            <input
+              onclick="postDelete()"
+              class="button"
+              type="button"
+              value="Delete Tweet"
+            />
+            <div class="inputs">
+              <input
+                id="deleteById"
+                type="text"
+                placeholder="Tweet Id"
+                class="input"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rightScreen">
+        <div class="inner">
+          <h1 id="responseTitle"></h1>
+          <pre id="responseBody"></pre>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
